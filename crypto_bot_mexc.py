@@ -18,10 +18,10 @@ import websockets
 logging.basicConfig(level=logging.INFO,
                     format="%(asctime)s %(levelname)s %(message)s")
 
-API_KEY    = os.getenv("MEXC_API_KEY")
-API_SECRET = os.getenv("MEXC_API_SECRET")
+API_KEY = os.getenv("API_KEY") or os.getenv("MEXC_API_KEY")
+API_SECRET = os.getenv("API_SECRET") or os.getenv("MEXC_API_SECRET")
 if not API_KEY or not API_SECRET:
-    raise RuntimeError("MEXC_API_KEY e MEXC_API_SECRET são obrigatórias.")
+    raise RuntimeError("API_KEY e API_SECRET são obrigatórios.")
 
 SYMBOL       = os.getenv("SYMBOL", "BTCUSDT").upper()
 INTERVAL     = os.getenv("INTERVAL", "1m").lower()  # ex: 1m, 5m
@@ -114,7 +114,23 @@ class CryptoBotMEXC:
         return sig
 
     async def manage(self):
-        ...  # mantém igual (omitido aqui por brevidade)
+        sig = self.signal()
+        if sig:
+            self.last_signal = sig
+
+        if self.position is None and sig == "BUY":
+            balance = await self.get_balance()
+            price = self.df.iloc[-1]["close"]
+            qty = (balance * RISK_PCT) / price
+            if qty > 0:
+                await self.create_order("BUY", qty)
+                self.position = {"side": "LONG", "qty": qty, "bars": 0}
+        elif self.position:
+            self.position["bars"] += 1
+            if sig == "SELL" and self.position["side"] == "LONG" and self.position["bars"] >= MIN_BARS_POS:
+                qty = self.position["qty"]
+                await self.create_order("SELL", qty)
+                self.position = None
 
     async def run(self):
         channel = f"spot@public.kline.v3.api.pb@{SYMBOL}@{interval_pb}"
