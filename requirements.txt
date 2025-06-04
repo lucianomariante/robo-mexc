@@ -5,6 +5,9 @@ ta>=0.11.0
 # HTTP assíncrono + WebSocket
 httpx>=0.27
 websockets>=11.0
+# Protocol Buffers
+protobuf>=4.25
+grpcio-tools>=1.62
 
 # (opcional) logs legíveis e requests sincronos genéricos
 requests>=2.31
