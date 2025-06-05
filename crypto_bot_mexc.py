@@ -14,6 +14,7 @@ from ta.volatility import average_true_range
 from ta.trend import ema_indicator
 from ta.momentum import rsi
 import websockets
+from mexc_pb import PushDataV3ApiWrapper_pb2
 
 logging.basicConfig(level=logging.INFO,
                     format="%(asctime)s %(levelname)s %(message)s")
@@ -123,16 +124,26 @@ class CryptoBotMEXC:
             try:
                 async with websockets.connect(WS_URL, ping_interval=20) as ws:
                     await ws.send(json.dumps(sub_msg))
-                    async for txt in ws:
-                        msg = json.loads(txt)
-                        if msg.get("channel") != channel:
-                            continue
-                        kline = msg.get("publicspotkline")
-                        if not kline:
-                            continue
-                        self.update_df(kline)
-                        self.compute_indicators()
-                        await self.manage()
+                    async for raw in ws:
+                        if isinstance(raw, bytes):
+                            wrapper = PushDataV3ApiWrapper_pb2.PushDataV3ApiWrapper()
+                            wrapper.ParseFromString(raw)
+                            if wrapper.channel != channel or wrapper.WhichOneof("body") != "publicSpotKline":
+                                continue
+                            k = wrapper.publicSpotKline
+                            kline = {
+                                "interval": k.interval,
+                                "windowstart": k.windowStart,
+                                "openingprice": k.openingPrice,
+                                "closingprice": k.closingPrice,
+                                "highestprice": k.highestPrice,
+                                "lowestprice": k.lowestPrice,
+                                "volume": k.volume,
+                                "windowend": k.windowEnd,
+                            }
+                            self.update_df(kline)
+                            self.compute_indicators()
+                            await self.manage()
             except Exception as e:
                 logging.error(f"WS erro: {e} — reconecta em 5 s")
                 await asyncio.sleep(5)
