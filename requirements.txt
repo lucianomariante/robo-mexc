@@ -11,3 +11,6 @@ grpcio-tools>=1.62
 
 # (opcional) logs legíveis e requests sincronos genéricos
 requests>=2.31
+
+# CMS
+Flask>=3.0
