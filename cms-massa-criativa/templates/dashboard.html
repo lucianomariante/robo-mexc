@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1 class="h3 mb-3">Sites dos clientes</h1>
+
+<div class="card shadow-sm mb-4">
+  <div class="card-body">
+    <h2 class="h5">Novo site</h2>
+    <form class="row g-2" method="post" action="{{ url_for('create_site') }}">
+      <div class="col-md-5"><input class="form-control" name="name" placeholder="Nome do cliente" required></div>
+      <div class="col-md-5"><input class="form-control" name="slug" placeholder="slug-do-cliente" required></div>
+      <div class="col-md-2 d-grid"><button class="btn btn-success" type="submit">Criar</button></div>
+    </form>
+  </div>
+</div>
+
+<div class="row g-3">
+  {% for site in sites %}
+  <div class="col-md-6 col-lg-4">
+    <div class="card h-100 shadow-sm">
+      <div class="card-body">
+        <h3 class="h5">{{ site['name'] }}</h3>
+        <p class="text-muted mb-2">Slug: <code>{{ site['slug'] }}</code></p>
+        <a class="btn btn-outline-primary btn-sm" href="{{ url_for('site_pages', site_id=site['id']) }}">Gerenciar páginas</a>
+      </div>
+    </div>
+  </div>
+  {% else %}
+  <p class="text-muted">Nenhum site cadastrado ainda.</p>
+  {% endfor %}
+</div>
+{% endblock %}

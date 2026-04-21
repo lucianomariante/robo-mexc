@@ -83,3 +83,8 @@ curl http://localhost:8000/api/sites/meu-cliente/pages/home
 ```
 
 > Para produção: configure `CMS_SECRET_KEY` e execute atrás de um servidor web (Nginx/Caddy) com HTTPS.
+
+
+## Novo projeto recomendado
+
+Atendendo ao pedido, foi criado um projeto separado em `cms-massa-criativa/`, pronto para ser versionado em um repositório Git próprio com o nome **CMS Massa Criativa**.
