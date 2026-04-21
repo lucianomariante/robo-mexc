@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1 class="h3 m-0">Editar página</h1>
+  <a class="btn btn-outline-secondary" href="{{ url_for('site_detail', site_id=page['site_id']) }}">Voltar</a>
+</div>
+
+<div class="card shadow-sm">
+  <div class="card-body">
+    <form method="post">
+      <div class="row g-2">
+        <div class="col-md-6">
+          <label class="form-label">Título</label>
+          <input class="form-control" name="title" value="{{ page['title'] }}" required />
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Slug</label>
+          <input class="form-control" name="slug" value="{{ page['slug'] }}" required />
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Status</label>
+          <select class="form-select" name="status">
+            <option value="draft" {% if page['status']=='draft' %}selected{% endif %}>Rascunho</option>
+            <option value="published" {% if page['status']=='published' %}selected{% endif %}>Publicado</option>
+          </select>
+        </div>
+      </div>
+      <div class="mt-2">
+        <label class="form-label">Conteúdo</label>
+        <textarea class="form-control" name="content" rows="10">{{ page['content'] }}</textarea>
+      </div>
+      <button class="btn btn-primary mt-3" type="submit">Atualizar</button>
+    </form>
+  </div>
+</div>
+{% endblock %}
